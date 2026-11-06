@@ -4,3 +4,7 @@
  * <p>Este proyecto base no incluye la solución de persistencia.
  */
 package es.academia.campushub.entity;
+
+
+
+
