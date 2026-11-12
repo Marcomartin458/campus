@@ -8,27 +8,32 @@ public class GrupoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long GrupoId;
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "nivel")
     private String nivel;
 
-    public GrupoEntity(Long id, String nombre, String nivel) {
-        this.id = id;
+    @OneToOne
+    @JoinColumn(name = "tutor_docente_id", updatable = false, nullable = false)
+    private DocenteEntity tutorDocente;
+
+    public GrupoEntity(Long GrupoId, String nombre, String nivel, DocenteEntity tutorDocente) {
+        this.GrupoId = GrupoId;
         this.nombre = nombre;
         this.nivel = nivel;
+        this.tutorDocente = tutorDocente;
     }
 
     public GrupoEntity() {
     }
 
-    public Long getId() {
-        return id;
+    public Long getGrupoId() {
+        return GrupoId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setGrupoId(Long GrupoId) {
+        this.GrupoId = GrupoId;
     }
 
     public String getNombre() {
@@ -46,4 +51,5 @@ public class GrupoEntity {
     public void setNivel(String nivel) {
         this.nivel = nivel;
     }
+
 }
