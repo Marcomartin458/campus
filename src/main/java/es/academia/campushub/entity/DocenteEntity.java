@@ -1,8 +1,7 @@
 package es.academia.campushub.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.NotNull;
 
 
 @Entity
@@ -22,6 +21,11 @@ public class DocenteEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "departamento_id", nullable = false)
+    private DepartamentoEntity departamento;
+
     public DocenteEntity() {
     }
 
@@ -30,6 +34,12 @@ public class DocenteEntity {
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
+    }
+
+    public DocenteEntity(
+            Long id, String nombre, String apellido, String email, DepartamentoEntity departamento) {
+        this(id, nombre, apellido, email);
+        this.departamento = departamento;
     }
 
     public Long getId() {
@@ -62,5 +72,13 @@ public class DocenteEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public DepartamentoEntity getDepartamento() {
+        return departamento;
+    }
+
+    public void setDepartamento(DepartamentoEntity departamento) {
+        this.departamento = departamento;
     }
 }

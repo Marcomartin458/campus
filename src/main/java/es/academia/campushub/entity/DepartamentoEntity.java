@@ -1,33 +1,46 @@
 package es.academia.campushub.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
-@Table
+@Table(name = "departamentos")
 public class DepartamentoEntity {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long DepartamentoId;
 
-    @Column
+    @NotBlank
+    @Column(nullable = false, unique = true)
     private String nombre;
 
-    public DepartamentoEntity(Long id, String nombre) {
-        this.id = id;
+    @OneToMany(mappedBy = "departamento")
+    private List<DocenteEntity> docentes = new ArrayList<>();
+
+    public DepartamentoEntity() {
+    }
+
+    public DepartamentoEntity(Long departamentoId, String nombre) {
+        this.DepartamentoId = departamentoId;
         this.nombre = nombre;
     }
 
-    public DepartamentoEntity() {
-
+    public Long getDepartamentoId() {
+        return DepartamentoId;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setDepartamentoId(Long departamentoId) {
+        this.DepartamentoId = departamentoId;
     }
 
     public String getNombre() {
@@ -36,5 +49,13 @@ public class DepartamentoEntity {
 
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+
+    public List<DocenteEntity> getDocentes() {
+        return docentes;
+    }
+
+    public void setDocentes(List<DocenteEntity> docentes) {
+        this.docentes = docentes;
     }
 }
