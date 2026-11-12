@@ -1,49 +1,81 @@
 package es.academia.campushub.entity;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDate;
 
 @Entity
-@Table
+@Table(name = "actividades")
 public class ActividadEntity {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ActividadId;
 
-    @Column
+    @NotBlank
+    @Column(nullable = false)
     private String titulo;
 
-    @Column
+    @NotBlank
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
-    @Column
-    private String tipoActividad;
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_actividad", nullable = false)
+    private TipoActividad tipoActividad;
 
-    @Column
-    private String fechaPrevista;
+    @NotNull
+    @Column(name = "fecha_prevista", nullable = false)
+    private LocalDate fechaPrevista;
 
-    @Column
+    @Min(1)
+    @Column(name = "numero_maximo_participantes", nullable = false)
     private int numeroMaximoParticipantes;
 
-    public ActividadEntity(Long id, String titulo, String descripcion, String tipoActividad, String fechaPrevista, int numeroMaximoParticipantes) {
-        this.id = id;
+    @NotNull
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "docente_responsable_id", nullable = false)
+    private DocenteEntity docenteResponsable;
+
+    public ActividadEntity() {
+    }
+
+    public ActividadEntity(
+            Long id,
+            String titulo,
+            String descripcion,
+            TipoActividad tipoActividad,
+            LocalDate fechaPrevista,
+            int numeroMaximoParticipantes,
+            DocenteEntity docenteResponsable) {
+        this.ActividadId = id;
         this.titulo = titulo;
         this.descripcion = descripcion;
         this.tipoActividad = tipoActividad;
         this.fechaPrevista = fechaPrevista;
         this.numeroMaximoParticipantes = numeroMaximoParticipantes;
+        this.docenteResponsable = docenteResponsable;
     }
 
-    public ActividadEntity() {
-
+    public Long getActividadId() {
+        return ActividadId;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+    public void setActividadId(Long id) {
+        this.ActividadId = id;
     }
 
     public String getTitulo() {
@@ -62,19 +94,19 @@ public class ActividadEntity {
         this.descripcion = descripcion;
     }
 
-    public String getTipoActividad() {
+    public TipoActividad getTipoActividad() {
         return tipoActividad;
     }
 
-    public void setTipoActividad(String tipoActividad) {
+    public void setTipoActividad(TipoActividad tipoActividad) {
         this.tipoActividad = tipoActividad;
     }
 
-    public String getFechaPrevista() {
+    public LocalDate getFechaPrevista() {
         return fechaPrevista;
     }
 
-    public void setFechaPrevista(String fechaPrevista) {
+    public void setFechaPrevista(LocalDate fechaPrevista) {
         this.fechaPrevista = fechaPrevista;
     }
 
@@ -86,4 +118,18 @@ public class ActividadEntity {
         this.numeroMaximoParticipantes = numeroMaximoParticipantes;
     }
 
+    public DocenteEntity getDocenteResponsable() {
+        return docenteResponsable;
+    }
+
+    public void setDocenteResponsable(DocenteEntity docenteResponsable) {
+        this.docenteResponsable = docenteResponsable;
+    }
+
+    public enum TipoActividad {
+        TALLER_PRACTICO,
+        CHARLA,
+        VISITA_A_EMPRESA,
+        JORNADA_TECNOLOGICA
+    }
 }
