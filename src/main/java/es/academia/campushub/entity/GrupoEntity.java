@@ -15,7 +15,7 @@ public class GrupoEntity {
     private String nivel;
 
     @OneToOne
-    @JoinColumn(name = "tutor_docente_id", updatable = false, nullable = false)
+    @JoinColumn(name = "tutorDocenteId", updatable = false, nullable = false)
     private DocenteEntity tutorDocente;
 
     public GrupoEntity(Long GrupoId, String nombre, String nivel, DocenteEntity tutorDocente) {

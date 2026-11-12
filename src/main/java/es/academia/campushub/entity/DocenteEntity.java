@@ -8,7 +8,7 @@ public class DocenteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long DocenteId;
+    private Long docenteId;
 
     @Column(nullable = false)
     private String nombre;
@@ -20,14 +20,14 @@ public class DocenteEntity {
     private String email;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "departamento_id", nullable = false)
+    @JoinColumn(name = "departamentoId", nullable = false)
     private DepartamentoEntity departamento;
 
     public DocenteEntity() {
     }
 
     public DocenteEntity(Long DocenteId, String nombre, String apellido, String email, DepartamentoEntity departamento) {
-        this.DocenteId = DocenteId;
+        this.docenteId = DocenteId;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
@@ -35,11 +35,11 @@ public class DocenteEntity {
     }
 
     public Long getId() {
-        return DocenteId;
+        return docenteId;
     }
 
     public void setId(Long id) {
-        this.DocenteId = id;
+        this.docenteId = id;
     }
 
     public String getNombre() {

@@ -3,6 +3,8 @@ package es.academia.campushub.entity;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "estudiante")
@@ -11,18 +13,24 @@ public class EstudianteEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long estudianteId;
-    @Column(name = "nombre")
+    @Column
     private String nombre;
-    @Column(name = "apellido")
+    @Column
     private String apellido;
-    @Column(unique = true, name = "correo")
+    @Column(unique = true)
     private String correo;
-    @Column(name = "fecha_nacimiento", unique = true)
+    @Column(unique = true)
     private LocalDate fechaNacimiento;
 
     @ManyToOne (fetch = FetchType.LAZY)
-    @JoinColumn(name = "grupo_id", insertable = false, updatable = false, nullable = false)
+    @JoinColumn(name = "grupoId", insertable = false, updatable = false, nullable = false)
     private GrupoEntity grupo;
+
+    @OneToOne(mappedBy = "estudiante", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private FichaContactoEntity fichaContacto;
+
+    @OneToMany(mappedBy = "estudiante", fetch = FetchType.LAZY)
+    private List<InscripcionesEntity> inscripciones = new ArrayList<>();
 
 
     public EstudianteEntity(Long estudianteId, String nombre, String apellido, String correo, LocalDate fechaNacimiento, Long grupoId) {

@@ -1,50 +1,44 @@
 package es.academia.campushub.entity;
 
 import jakarta.persistence.*;
-
+import java.time.LocalDate;
 
 @Entity
-@Table
+@Table(name = "fichas_contacto")
 public class FichaContactoEntity {
 
     @Id
-    @GeneratedValue
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long fichaContactoId;
 
-    @Column
+    @Column(name = "nombre_tutor_legal", nullable = false)
     private String nombreTutorLegal;
 
-    @Column
+    @Column(nullable = false)
     private String telefono;
 
-    @Column
+    @Column(name = "correo_electronico", nullable = false)
     private String correoElectronico;
 
-    @Column
-    private boolean autorizaParticipacion;
+    @Column(name = "autoriza_fuera_centro", nullable = false)
+    private Boolean autorizaFueraCentro;
 
-    @Column
-    private String fechaAutorizacion;
+    @Column(name = "fecha_autorizacion", nullable = false)
+    private LocalDate fechaAutorizacion;
 
-    public FichaContactoEntity(Long id, String nombreTutorLegal, String telefono, String correoElectronico, boolean autorizaParticipacion, String fechaAutorizacion) {
-        this.id = id;
-        this.nombreTutorLegal = nombreTutorLegal;
-        this.telefono = telefono;
-        this.correoElectronico = correoElectronico;
-        this.autorizaParticipacion = autorizaParticipacion;
-        this.fechaAutorizacion = fechaAutorizacion;
-    }
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "estudiante_id", nullable = false, unique = true)
+    private EstudianteEntity estudiante;
 
     public FichaContactoEntity() {
-
     }
 
-    public Long getId() {
-        return id;
+    public Long getFichaContactoId() {
+        return fichaContactoId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setFichaContactoId(Long fichaContactoId) {
+        this.fichaContactoId = fichaContactoId;
     }
 
     public String getNombreTutorLegal() {
@@ -71,20 +65,27 @@ public class FichaContactoEntity {
         this.correoElectronico = correoElectronico;
     }
 
-    public boolean isAutorizaParticipacion() {
-        return autorizaParticipacion;
+    public Boolean getAutorizaFueraCentro() {
+        return autorizaFueraCentro;
     }
 
-    public void setAutorizaParticipacion(boolean autorizaParticipacion) {
-        this.autorizaParticipacion = autorizaParticipacion;
+    public void setAutorizaFueraCentro(Boolean autorizaFueraCentro) {
+        this.autorizaFueraCentro = autorizaFueraCentro;
     }
 
-    public String getFechaAutorizacion() {
+    public LocalDate getFechaAutorizacion() {
         return fechaAutorizacion;
     }
 
-    public void setFechaAutorizacion(String fechaAutorizacion) {
+    public void setFechaAutorizacion(LocalDate fechaAutorizacion) {
         this.fechaAutorizacion = fechaAutorizacion;
     }
-}
 
+    public EstudianteEntity getEstudiante() {
+        return estudiante;
+    }
+
+    public void setEstudiante(EstudianteEntity estudiante) {
+        this.estudiante = estudiante;
+    }
+}

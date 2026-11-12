@@ -32,7 +32,6 @@ public class ActividadEntity {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String descripcion;
 
-    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_actividad", nullable = false)
     private TipoActividad tipoActividad;
@@ -45,9 +44,8 @@ public class ActividadEntity {
     @Column(name = "numero_maximo_participantes", nullable = false)
     private int numeroMaximoParticipantes;
 
-    @NotNull
     @ManyToOne(optional = false)
-    @JoinColumn(name = "docente_responsable_id", nullable = false)
+    @JoinColumn(name = "docenteResponsableId", nullable = false)
     private DocenteEntity docenteResponsable;
 
     public ActividadEntity() {

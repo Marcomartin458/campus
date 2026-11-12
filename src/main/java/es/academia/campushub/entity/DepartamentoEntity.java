@@ -1,12 +1,6 @@
 package es.academia.campushub.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.ArrayList;
@@ -18,29 +12,29 @@ public class DepartamentoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long DepartamentoId;
+    private Long departamentoId;
 
     @NotBlank
     @Column(nullable = false, unique = true)
     private String nombre;
 
-    @OneToMany(mappedBy = "departamento")
+    @OneToMany(mappedBy = "departamento", fetch = FetchType.LAZY)
     private List<DocenteEntity> docentes = new ArrayList<>();
 
     public DepartamentoEntity() {
     }
 
     public DepartamentoEntity(Long departamentoId, String nombre) {
-        this.DepartamentoId = departamentoId;
+        this.departamentoId = departamentoId;
         this.nombre = nombre;
     }
 
     public Long getDepartamentoId() {
-        return DepartamentoId;
+        return departamentoId;
     }
 
     public void setDepartamentoId(Long departamentoId) {
-        this.DepartamentoId = departamentoId;
+        this.departamentoId = departamentoId;
     }
 
     public String getNombre() {
