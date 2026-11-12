@@ -1,9 +1,6 @@
 package es.academia.campushub.entity;
 
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
-
 
 @Entity
 @Table(name = "docentes")
@@ -11,7 +8,7 @@ public class DocenteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long DocenteId;
 
     @Column(nullable = false)
     private String nombre;
@@ -22,22 +19,27 @@ public class DocenteEntity {
     @Column(unique = true, nullable = false)
     private String email;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "departamento_id", nullable = false)
+    private DepartamentoEntity departamento;
+
     public DocenteEntity() {
     }
 
-    public DocenteEntity(Long id, String nombre, String apellido, String email) {
-        this.id = id;
+    public DocenteEntity(Long DocenteId, String nombre, String apellido, String email, DepartamentoEntity departamento) {
+        this.DocenteId = DocenteId;
         this.nombre = nombre;
         this.apellido = apellido;
         this.email = email;
+        this.departamento = departamento;
     }
 
     public Long getId() {
-        return id;
+        return DocenteId;
     }
 
     public void setId(Long id) {
-        this.id = id;
+        this.DocenteId = id;
     }
 
     public String getNombre() {
@@ -62,5 +64,13 @@ public class DocenteEntity {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public DepartamentoEntity getDepartamento() {
+        return departamento;
+    }
+
+    public void setDepartamento(DepartamentoEntity departamento) {
+        this.departamento = departamento;
     }
 }
