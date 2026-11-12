@@ -10,33 +10,40 @@ public class EstudianteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long estudianteId;
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "apellido")
     private String apellido;
     @Column(unique = true, name = "correo")
     private String correo;
-    @Column(name = "fecha_nacimiento")
-    private LocalDate fechanacimiento;
+    @Column(name = "fecha_nacimiento", unique = true)
+    private LocalDate fechaNacimiento;
 
-    public EstudianteEntity(Long id, String nombre, String apellido, String correo, LocalDate fechanacimiento) {
-        this.id = id;
+    @ManyToOne (fetch = FetchType.LAZY)
+    @JoinColumn(name = "grupo_id", insertable = false, updatable = false, nullable = false)
+    private GrupoEntity grupo;
+
+
+    public EstudianteEntity(Long estudianteId, String nombre, String apellido, String correo, LocalDate fechaNacimiento, Long grupoId) {
+        this.estudianteId = estudianteId;
         this.nombre = nombre;
         this.apellido = apellido;
         this.correo = correo;
-        this.fechanacimiento = fechanacimiento;
+        this.fechaNacimiento = fechaNacimiento;
+        this.grupo = new GrupoEntity();
+        this.grupo.setGrupoId(grupoId);
     }
 
     public EstudianteEntity() {
     }
 
-    public Long getId() {
-        return id;
+    public Long getEstudianteId() {
+        return estudianteId;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setEstudianteId(Long estudianteId) {
+        this.estudianteId = estudianteId;
     }
 
     public String getNombre() {
@@ -63,11 +70,19 @@ public class EstudianteEntity {
         this.correo = correo;
     }
 
-    public LocalDate getFechanacimiento() {
-        return fechanacimiento;
+    public LocalDate getFechaNacimiento() {
+        return fechaNacimiento;
     }
 
-    public void setFechanacimiento(LocalDate fechanacimiento) {
-        this.fechanacimiento = fechanacimiento;
+    public void setFechaNacimiento(LocalDate fechaNacimiento) {
+        this.fechaNacimiento = fechaNacimiento;
+    }
+
+    public GrupoEntity getGrupo() {
+        return grupo;
+    }
+
+    public void setGrupo(GrupoEntity grupo) {
+        this.grupo = grupo;
     }
 }
