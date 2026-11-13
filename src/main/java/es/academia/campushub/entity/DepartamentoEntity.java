@@ -2,12 +2,13 @@ package es.academia.campushub.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-
+import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "departamentos")
+
 public class DepartamentoEntity {
 
     @Id
@@ -15,7 +16,8 @@ public class DepartamentoEntity {
     private Long departamentoId;
 
     @NotBlank
-    @Column(nullable = false, unique = true)
+    @Size(max = 100)
+    @Column(nullable = false, unique = true, length = 100)
     private String nombre;
 
     @OneToMany(mappedBy = "departamento", fetch = FetchType.LAZY)

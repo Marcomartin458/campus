@@ -1,28 +1,40 @@
 package es.academia.campushub.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "fichas_contacto")
+
 public class FichaContactoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long fichaContactoId;
 
-    @Column(name = "nombre_tutor_legal", nullable = false)
+    @NotBlank
+    @Size(max = 160)
+    @Column(name = "nombre_tutor_legal", nullable = false, length = 160)
     private String nombreTutorLegal;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Size(max = 32)
+    @Column(nullable = false, length = 32)
     private String telefono;
 
-    @Column(name = "correo_electronico", nullable = false)
+    @NotBlank
+    @Size(max = 254)
+    @Column(name = "correo_electronico", nullable = false, length = 254)
     private String correoElectronico;
 
+    @NotNull
     @Column(name = "autoriza_fuera_centro", nullable = false)
     private Boolean autorizaFueraCentro;
 
+    @NotNull
     @Column(name = "fecha_autorizacion", nullable = false)
     private LocalDate fechaAutorizacion;
 

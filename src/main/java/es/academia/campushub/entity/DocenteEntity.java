@@ -1,25 +1,34 @@
 package es.academia.campushub.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "docentes")
+
 public class DocenteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long docenteId;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Size(max = 80)
+    @Column(nullable = false, length = 80)
     private String nombre;
 
-    @Column(nullable = false)
+    @NotBlank
+    @Size(max = 120)
+    @Column(nullable = false, length = 120)
     private String apellido;
 
-    @Column(unique = true, nullable = false)
+    @NotBlank
+    @Size(max = 254)
+    @Column(unique = true, nullable = false, length = 254)
     private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "departamentoId", nullable = false)
     private DepartamentoEntity departamento;
 

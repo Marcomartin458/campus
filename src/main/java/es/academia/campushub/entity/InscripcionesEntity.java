@@ -5,14 +5,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(
-        name = "inscripciones",
-        uniqueConstraints = {
-                @UniqueConstraint(
-                        name = "InscripcionEstudianteActividad",
-                        columnNames = {"estudiante_id", "actividad_id"}
-                )
-        }
-)
+    name = "inscripciones",
+    uniqueConstraints =
+        @UniqueConstraint(
+            name = "uk_inscripcion_estudiante_actividad",
+            columnNames = {"estudiante_id", "actividad_id"}),
+    indexes = @Index(name = "idx_inscripciones_actividad", columnList = "actividad_id"))
 public class InscripcionesEntity {
 
     @Id
@@ -27,7 +25,7 @@ public class InscripcionesEntity {
     @JoinColumn(name = "actividad_id", nullable = false)
     private ActividadEntity actividad;
 
-    @Column(name = "fechaInscripcion", nullable = false, updatable = false)
+    @Column(name = "fecha_inscripcion", nullable = false, updatable = false)
     private LocalDateTime fechaInscripcion;
 
     public InscripcionesEntity() {

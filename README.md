@@ -66,12 +66,14 @@ docker compose exec redis redis-cli
 
 Con la aplicación arrancada, la API se publica automáticamente en:
 
-- Swagger UI: <http://localhost:8080/swagger-ui.html>
-- OpenAPI JSON: <http://localhost:8080/v3/api-docs>
-- OpenAPI YAML: <http://localhost:8080/v3/api-docs.yaml>
+- Swagger UI: <http://localhost:8084/swagger-ui.html>
+- OpenAPI JSON: <http://localhost:8084/v3/api-docs>
+- OpenAPI YAML: <http://localhost:8084/v3/api-docs.yaml>
 
 Springdoc obtiene el contrato inicial de los controllers y DTO. El alumno puede enriquecerlo con
 anotaciones OpenAPI, pero no debe cambiar los endpoints ni los cuerpos fijados por las pruebas.
+La ruta raíz `/` no está definida; para explorar la API, abre Swagger UI o consulta directamente
+sus endpoints `/api/...`.
 
 ## Tests
 

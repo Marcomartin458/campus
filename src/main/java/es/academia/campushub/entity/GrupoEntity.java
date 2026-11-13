@@ -1,25 +1,34 @@
 package es.academia.campushub.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 @Entity
 @Table(name = "grupo")
+
 public class GrupoEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long GrupoId;
-    @Column(name = "nombre")
+    private Long grupoId;
+
+    @NotBlank
+    @Size(max = 100)
+    @Column(name = "nombre", nullable = false, length = 100)
     private String nombre;
-    @Column(name = "nivel")
+
+    @NotBlank
+    @Size(max = 50)
+    @Column(name = "nivel", nullable = false, length = 50)
     private String nivel;
 
-    @OneToOne
-    @JoinColumn(name = "tutorDocenteId", updatable = false, nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "tutorDocenteId", nullable = false)
     private DocenteEntity tutorDocente;
 
-    public GrupoEntity(Long GrupoId, String nombre, String nivel, DocenteEntity tutorDocente) {
-        this.GrupoId = GrupoId;
+    public GrupoEntity(Long grupoId, String nombre, String nivel, DocenteEntity tutorDocente) {
+        this.grupoId = grupoId;
         this.nombre = nombre;
         this.nivel = nivel;
         this.tutorDocente = tutorDocente;
@@ -29,11 +38,11 @@ public class GrupoEntity {
     }
 
     public Long getGrupoId() {
-        return GrupoId;
+        return grupoId;
     }
 
-    public void setGrupoId(Long GrupoId) {
-        this.GrupoId = GrupoId;
+    public void setGrupoId(Long grupoId) {
+        this.grupoId = grupoId;
     }
 
     public String getNombre() {
@@ -52,4 +61,11 @@ public class GrupoEntity {
         this.nivel = nivel;
     }
 
+    public DocenteEntity getTutorDocente() {
+        return tutorDocente;
+    }
+
+    public void setTutorDocente(DocenteEntity tutorDocente) {
+        this.tutorDocente = tutorDocente;
+    }
 }
