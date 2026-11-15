@@ -239,23 +239,67 @@ public class CampusHubServiceImpl implements CampusHubService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ContactoResponse contacto(Long estudianteId) {
-    throw new PersistenciaPendienteException("contacto");
+    estudiante(estudianteId);
+    var ficha =
+        contactos
+            .findByEstudiante_EstudianteId(estudianteId)
+            .orElseThrow(() -> new ResourceNotFoundException("El estudiante no tiene ficha"));
+
+    return new ContactoResponse(
+        ficha.getEstudiante().getEstudianteId(),
+        ficha.getNombreTutorLegal(),
+        ficha.getTelefono(),
+        ficha.getCorreoElectronico(),
+        ficha.getAutorizaFueraCentro(),
+        ficha.getFechaAutorizacion().toString());
   }
 
   @Override
+  @Transactional
   public EtiquetaResponse crearEtiqueta(CreateEtiquetaRequest request) {
-    throw new PersistenciaPendienteException("crearEtiqueta");
+    requireRequest(request);
+    String nombre = require(request.nombre(), "nombre");
+
+    if (etiquetas.findByNombre(nombre).isPresent()) {
+      throw new BusinessConflictException("Ya existe una etiqueta con ese nombre");
+    }
+
+    var guardada = etiquetas.save(new es.academia.campushub.entity.EtiquetaEntity(null, nombre));
+    return new EtiquetaResponse(guardada.getId(), guardada.getNombre());
   }
 
   @Override
+  @Transactional
   public void asociarEtiqueta(Long actividadId, Long etiquetaId) {
-    throw new PersistenciaPendienteException("asociarEtiqueta");
+    ActividadEntity actividad = actividad(actividadId);
+    es.academia.campushub.entity.EtiquetaEntity etiqueta =
+        etiquetas
+            .findById(requiredId(etiquetaId, "etiquetaId"))
+            .orElseThrow(() -> new ResourceNotFoundException("No existe la etiqueta indicada"));
+
+    boolean yaAsociada =
+        actividad.getEtiquetas().stream()
+            .anyMatch(actual -> java.util.Objects.equals(actual.getId(), etiquetaId));
+
+    if (!yaAsociada) {
+      actividad.addEtiqueta(etiqueta);
+      actividades.save(actividad);
+    }
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ActividadResponse> actividadesPorEtiqueta(Long etiquetaId) {
-    throw new PersistenciaPendienteException("actividadesPorEtiqueta");
+    Long id = requiredId(etiquetaId, "etiquetaId");
+    if (!etiquetas.existsById(id)) {
+      throw new ResourceNotFoundException("No existe la etiqueta indicada");
+    }
+
+    return actividades.findAllByEtiquetaId(id).stream()
+        .map(CampusHubServiceImpl::actividadResponse)
+        .toList();
   }
 
   private static void requireRequest(Object request) {
