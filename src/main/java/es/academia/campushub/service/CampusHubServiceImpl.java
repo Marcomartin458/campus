@@ -49,6 +49,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Punto de entrada de la tarea. Sustituye cada stub por una implementación real. NO hay entidades,
  * repositorios ni documentos entregados.
  */
+
 @Service
 public class CampusHubServiceImpl implements CampusHubService {
   private final DepartamentoRepository departamentos;
@@ -208,34 +209,124 @@ public class CampusHubServiceImpl implements CampusHubService {
   }
 
   @Override
+  @Transactional
   public InscripcionResponse inscribir(Long actividadId, CreateInscripcionRequest request) {
-    throw new PersistenciaPendienteException("inscribir");
+    requireRequest(request);
+    Long id = requiredId(actividadId, "actividadId");
+    Long estudianteId = requiredId(request.estudianteId(), "estudianteId");
+
+    ActividadEntity actividad = actividades.findByIdForUpdate(id)
+            .orElseThrow(() -> new ResourceNotFoundException("No existe la actividad indicada"));
+    EstudianteEntity estudiante = estudiante(estudianteId);
+
+    if (inscripciones.existsByActividad_ActividadIdAndEstudiante_EstudianteId(id, estudianteId)) {
+      throw new BusinessConflictException("El estudiante ya está inscrito en esta actividad");
+    }
+    if (inscripciones.countByActividad_ActividadId(id) >= actividad.getNumeroMaximoParticipantes()) {
+      throw new BusinessConflictException("No quedan plazas disponibles en esta actividad");
+    }
+
+    var guardada = inscripciones.saveAndFlush(
+            new es.academia.campushub.entity.InscripcionesEntity(estudiante, actividad));
+    return new InscripcionResponse(guardada.getId(), id, estudianteId,
+            guardada.getFechaInscripcion().toString());
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<EstudianteResponse> participantes(Long actividadId) {
-    throw new PersistenciaPendienteException("participantes");
+    Long id = requiredId(actividadId, "actividadId");
+    actividad(id);
+    return inscripciones.findAllByActividad_ActividadId(id).stream()
+            .map(inscripcion -> estudianteResponse(inscripcion.getEstudiante()))
+            .toList();
   }
 
   @Override
   public SeguimientoResponse registrarSeguimiento(
-      Long actividadId, CreateSeguimientoRequest request) {
-    throw new PersistenciaPendienteException("registrarSeguimiento");
+          Long actividadId, CreateSeguimientoRequest request) {
+    requireRequest(request);
+    Long id = requiredId(actividadId, "actividadId");
+    actividad(id);
+    String tipo = require(request.tipo(), "tipo");
+    if (request.datos() == null) {
+      throw new InvalidInputException("datos es obligatorio");
+    }
+    var guardado = seguimiento.save(new es.academia.campushub.document.SeguimientoDocument(
+            id, tipo, request.datos(), java.time.LocalDateTime.now().toString()));
+    return new SeguimientoResponse(guardado.getId(), guardado.getActividadId(),
+            guardado.getTipo(), guardado.getDatos(), guardado.getCreadoEn());
   }
 
   @Override
+  @Transactional(readOnly = true)
   public ActividadDetalleResponse detalle(Long id) {
-    throw new PersistenciaPendienteException("detalle");
+    ActividadEntity actividad = actividad(id);
+    Long actividadId = actividad.getActividadId();
+    List<EstudianteResponse> estudiantesInscritos = inscripciones
+            .findAllByActividad_ActividadId(actividadId).stream()
+            .map(inscripcion -> estudianteResponse(inscripcion.getEstudiante()))
+            .toList();
+    int ocupadas = estudiantesInscritos.size();
+    List<EtiquetaResponse> etiquetasActividad = actividad.getEtiquetas().stream()
+            .map(etiqueta -> new EtiquetaResponse(etiqueta.getId(), etiqueta.getNombre()))
+            .toList();
+    List<SeguimientoResponse> seguimientos = seguimiento
+            .findAllByActividadIdOrderByCreadoEnAsc(actividadId).stream()
+            .map(doc -> new SeguimientoResponse(doc.getId(), doc.getActividadId(),
+                    doc.getTipo(), doc.getDatos(), doc.getCreadoEn()))
+            .toList();
+
+    return new ActividadDetalleResponse(actividadResponse(actividad),
+            docenteResponse(actividad.getDocenteResponsable()), ocupadas,
+            actividad.getNumeroMaximoParticipantes() - ocupadas,
+            estudiantesInscritos, etiquetasActividad, seguimientos);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<ActividadHistorialResponse> historial(Long estudianteId) {
-    throw new PersistenciaPendienteException("historial");
+    Long id = requiredId(estudianteId, "estudianteId");
+    estudiante(id);
+    return inscripciones.findAllByEstudiante_EstudianteIdOrderByFechaInscripcionDesc(id)
+            .stream()
+            .map(inscripcion -> {
+              ActividadEntity actividad = inscripcion.getActividad();
+              return new ActividadHistorialResponse(actividad.getActividadId(),
+                      actividad.getTitulo(), actividad.getTipoActividad().name(),
+                      actividad.getFechaPrevista().toString(),
+                      inscripcion.getFechaInscripcion().toString(),
+                      docenteResponse(actividad.getDocenteResponsable()));
+            })
+            .toList();
   }
 
   @Override
+  @Transactional
   public ContactoResponse guardarContacto(Long estudianteId, UpsertContactoRequest request) {
-    throw new PersistenciaPendienteException("guardarContacto");
+    requireRequest(request);
+    Long id = requiredId(estudianteId, "estudianteId");
+    EstudianteEntity estudiante = estudiante(id);
+    String tutorLegal = require(request.tutorLegal(), "tutorLegal");
+    String telefono = require(request.telefono(), "telefono");
+    String email = require(request.email(), "email");
+    if (request.autorizado() == null) {
+      throw new InvalidInputException("autorizado es obligatorio");
+    }
+    LocalDate fecha = parseDate(request.fechaAutorizacion(), "fechaAutorizacion");
+
+    var ficha = contactos.findByEstudiante_EstudianteId(id)
+            .orElseGet(es.academia.campushub.entity.FichaContactoEntity::new);
+    ficha.setEstudiante(estudiante);
+    ficha.setNombreTutorLegal(tutorLegal);
+    ficha.setTelefono(telefono);
+    ficha.setCorreoElectronico(email);
+    ficha.setAutorizaFueraCentro(request.autorizado());
+    ficha.setFechaAutorizacion(fecha);
+    var guardada = contactos.save(ficha);
+    return new ContactoResponse(id, guardada.getNombreTutorLegal(),
+            guardada.getTelefono(), guardada.getCorreoElectronico(),
+            guardada.getAutorizaFueraCentro(), guardada.getFechaAutorizacion().toString());
   }
 
   @Override
