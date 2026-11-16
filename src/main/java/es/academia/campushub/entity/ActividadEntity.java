@@ -142,6 +142,6 @@ public class ActividadEntity {
     }
 
     public enum TipoActividad {
-        TALLER_PRACTICO, CHARLA, VISITA_A_EMPRESA, JORNADA_TECNOLOGICA
+        TALLER, CHARLA, VISITA, JORNADA
     }
 }
